@@ -19,7 +19,6 @@ cabal provides the cnecessary arguments to pass in the toolchain.
 
 https://github.com/ghc-ios/ghc-ios-scripts
 
-Morritz tool-chain wrapper has the wrapped ld, clang, it also has cabal
 
 
 

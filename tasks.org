@@ -19,7 +19,11 @@
 Using cabal and cross-compilation flags.
 https://log.zw3rk.com/posts/2017-05-17-the-haskell-cabal-and-cross-compilation/
 https://github.com/ghc-ios/ghc-ios-scripts
-*** IN_PROGRESS Create a HTTP request with a haskell HTTP library
+
+Morritz tool-chain wrapper has the wrapped ld, clang, it also has cabal, so no need to use ghc-ios-scripts.
+*** DONE Create a HTTP request with a haskell HTTP library
+    CLOSED: [2021-12-20 Mon 16:41]
+    [[file:CrossCompilationBlogTutorial/iOSProjectCabal/]]
 *** TODO Perfrom SQLite operations with Haskell SQLite library
 ** UNREFINED_TASK Create a 'compiling a cross compiler for mobile' Wiki entry.
 *** UNREFINED_TASK Things involved when compiling Haskell and what are the relevant steps for cross compile for a platform.
