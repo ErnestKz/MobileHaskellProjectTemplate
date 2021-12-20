@@ -1,0 +1,10 @@
+Creating some scripts and following steps of:
+- https://log.zw3rk.com/posts/2017-06-06-a-haskell-cross-compiler-for-ios/
+- https://log.zw3rk.com/posts/2017-05-30-a-haskell-cross-compiler-for-android/
+
+Relevant links:
+- https://github.com/zw3rk/hs-ios-helloworld
+- http://hackage.mobilehaskell.org/
+- https://log.zw3rk.com/posts/2018-01-12-talk-building-android-apps-with-haskell/
+- https://speakerdeck.com/angerman/building-android-apps-with-haskell?slide=5
+- https://releases.llvm.org/download.html#5.0.0
