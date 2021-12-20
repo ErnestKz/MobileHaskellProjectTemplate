@@ -16,6 +16,9 @@
     - Ran app.
       
 ** IN_PROGRESS Compile Haskell with libraries, using most straightforward approach
+Using cabal and cross-compilation flags.
+https://log.zw3rk.com/posts/2017-05-17-the-haskell-cabal-and-cross-compilation/
+https://github.com/ghc-ios/ghc-ios-scripts
 *** IN_PROGRESS Create a HTTP request with a haskell HTTP library
 *** TODO Perfrom SQLite operations with Haskell SQLite library
 ** UNREFINED_TASK Create a 'compiling a cross compiler for mobile' Wiki entry.

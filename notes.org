@@ -1,0 +1,77 @@
+** Haskell Cabal and Cross Compilation
+https://log.zw3rk.com/posts/2017-05-19-ghc-s-cross-compilation-pipeline/
+
+*** Cabal Cross Compilation
+https://log.zw3rk.com/posts/2017-05-17-the-haskell-cabal-and-cross-compilation/
+cabal will use a non-prefixed toolchain, which results in the library being compiled for the build machine.
+
+cabal provides the cnecessary arguments to pass in the toolchain.
+
+--builddir=dist/arm-linux-gnueabihf
+
+--with-ghc=arm-linux-gnueabihf-ghc
+--with-ghc-pkg=arm-linux-gnueabihf-ghc-pkg
+--with-gcc=arm-linux-gnueabihf-clang
+--with-ld=arm-linux-gnueabihf-ld
+--hsc2hs-options=--cross-compile
+
+--configure-option=--host=arm-linux-gnueabihf
+
+https://github.com/ghc-ios/ghc-ios-scripts
+
+Morritz tool-chain wrapper has the wrapped ld, clang, it also has cabal
+
+
+
+** GHC and Libraries
+https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/packages.html
+https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/separate_compilation.html
+https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/shared_libs.html
+https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/phases.html
+https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/utils.html hsc2hs
+** Nix Flakes
+https://www.tweag.io/blog/2021-12-20-nix-2.4/
+*** Part 1
+https://www.tweag.io/blog/2020-05-25-flakes/
+
+Original Nix expressions can access
+- arbitrary files, e.g ~/.config/nixpkgs/config.nix
+- environment variables
+- git repositories
+- files in Nix search path $NIX_PATH
+- command-line arguments --arg
+- and the system type builtins.currentSystem
+
+No standard way to compose nix based projects.
+Typical ways to compose Nix files rely on Nix search path
+- e.g import <nixpkgs> or use fetchGit or fetchTarball
+  - poor reproducabilty and and bad user experience due to usage of git hashes
+
+No easy way to deliver Nix-based projects to users.
+Nix has a 'channel' mechanism, but it's not easy to create channels and they are not composable.
+
+Nix projects lack standardised structure.
+- there are conventions e.g shell.nix or release.nix
+  - but dont cover many common use cases
+    - no way to discover NixOS modules provided by repository
+
+Flake is the solution
+
+Flake is just a source tree. e.g git repository
+- containing a file named flake.nix
+  - provides standardized interface to Nix artifacts
+    - such as
+      - packages
+      - NixOS modules
+
+Flakes can have deps on other flakes
+- With a lock file pinning those deps to exact revs
+
+**** Using Flakes
+https://github.com/edolstra/dwarffs
+it is a flake because it contains a file names flake.nix
+- it tells nix what the flake provides
+  - Such as 
+    - Nix packages
+    - NixOS modules
+    - CI tests
