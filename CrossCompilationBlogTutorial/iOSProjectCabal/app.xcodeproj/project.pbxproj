@@ -12,6 +12,7 @@
 		4543E8BB276AC2D4004C4865 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4543E8BA276AC2D4004C4865 /* Assets.xcassets */; };
 		4543E8BE276AC2D4004C4865 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4543E8BD276AC2D4004C4865 /* Preview Assets.xcassets */; };
 		45DF0C272770A65500ED16D3 /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 45DF0C23276D3CF200ED16D3 /* libiconv.tbd */; };
+		45DF0C292770E4C900ED16D3 /* liba.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 45DF0C282770E4C900ED16D3 /* liba.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,6 +24,7 @@
 		45DF0C23276D3CF200ED16D3 /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
 		45DF0C252770A37600ED16D3 /* app-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "app-Bridging-Header.h"; sourceTree = SOURCE_ROOT; };
 		45DF0C262770A64800ED16D3 /* libiconv.2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.2.tbd; path = usr/lib/libiconv.2.tbd; sourceTree = SDKROOT; };
+		45DF0C282770E4C900ED16D3 /* liba.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liba.a; path = lib/liba.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -30,6 +32,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				45DF0C292770E4C900ED16D3 /* liba.a in Frameworks */,
 				45DF0C272770A65500ED16D3 /* libiconv.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -77,6 +80,7 @@
 		45DF0C22276D3CF200ED16D3 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				45DF0C282770E4C900ED16D3 /* liba.a */,
 				45DF0C262770A64800ED16D3 /* libiconv.2.tbd */,
 				45DF0C23276D3CF200ED16D3 /* libiconv.tbd */,
 			);
@@ -297,11 +301,15 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/lib",
+				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = (
 					"-L",
 					lib/,
-					"-lhs",
+					"-la",
 				);
 				PRELINK_LIBS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = app.app;
@@ -333,11 +341,15 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/lib",
+				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = (
 					"-L",
 					lib/,
-					"-lhs",
+					"-la",
 				);
 				PRELINK_LIBS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = app.app;

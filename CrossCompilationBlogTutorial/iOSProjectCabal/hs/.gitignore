@@ -1,0 +1,6 @@
+build
+lib
+lib_arm
+lib_x86
+dist
+dist-newstyle
