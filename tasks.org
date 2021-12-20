@@ -1,6 +1,6 @@
 * Tasks
-** DONE Explore Moritzs Cross Compilation Tutorials
-   CLOSED: [2021-12-17]
+** DONE Implement zw3rks Cross Compilation Tutorials
+   CLOSED: [2021-12-20 Mon 12:18]
    Results: [[file:CrossCompilationBlogTutorial/]]
 *** DONE Android
     CLOSED: [2021-12-17]
@@ -14,6 +14,18 @@
     - Compiled statically linked archive file of the HS library.
     - Setup xcode to link app.
     - Ran app.
-** TODO Stack Project with Library
-* Notes
-   
+      
+** IN_PROGRESS Compile Haskell with libraries, using most straightforward approach
+*** IN_PROGRESS Create a HTTP request with a haskell HTTP library
+*** TODO Perfrom SQLite operations with Haskell SQLite library
+** UNREFINED_TASK Create a 'compiling a cross compiler for mobile' Wiki entry.
+*** UNREFINED_TASK Things involved when compiling Haskell and what are the relevant steps for cross compile for a platform.
+** UNREFINED_TASK Create/Gather scripts for compiling a cross compiler.
+** UNREFINED_TASK Create a 'dealing with Template Haskell' Wiki entry.
+** UNREFINED_TASK Create a 'using Haskell libraries' Wiki entry.
+** UNREFINED_TASK Create a 'common OS Haskell interop patches' Wiki entry, detailing how to patch a library to work for mobile.
+** UNREFINED_TASK Create a 'Worflow for compiling and developing mobile Haskell projects' wiki entry.
+** UNREFINED_TASK Create scripts for compiling and developing mobile Haskell projects.
+** UNREFINED_TASK Create Github CI workflow for compiling projects.
+** UNREFINED_TASK Create nix expression for compiling cross compilers.
+** UNREFINED_TASK Create nix cache service for Haskell mobile packages and compilers.   

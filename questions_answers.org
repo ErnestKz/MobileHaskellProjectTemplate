@@ -1,0 +1,13 @@
+* Uncategorised
+** How does haskell use the OS system calls?
+** What does CLI compilation look like for XCode projects?
+** What does CLI compliation look like for Android projects?
+** Is compiling Haskell for cpu architecture distinctly different to compiling haskell for an operating system?
+** What are the relevent cabal options and configurations for Haskell mobile and cross compilation?
+** Does cabal have a config file?   
+** Is there a compiler flag for architecture?
+** Is there a compiler flag for operating system?
+** Is there GHC pragmas for operating system?
+** Are hackage overlays just patches over packages?
+** What support does stack have for cross compiling?
+
