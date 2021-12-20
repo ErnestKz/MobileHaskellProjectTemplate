@@ -1,9 +1,9 @@
-#include <HsFFI.h>
-#if defined(__cplusplus)
+#include "HsFFI.h"
+#ifdef __cplusplus
 extern "C" {
 #endif
 extern HsPtr hello(void);
-#if defined(__cplusplus)
+#ifdef __cplusplus
 }
 #endif
 

@@ -9,6 +9,8 @@ library
     exposed-modules:  Lib
 
     build-depends:    base
+                    , HTTP
+                      
     -- hs-source-dirs:   lib
     default-language: Haskell2010
 
