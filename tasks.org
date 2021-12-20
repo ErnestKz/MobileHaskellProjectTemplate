@@ -1,13 +1,12 @@
 * Tasks
 ** DONE Explore Moritzs Cross Compilation Tutorials
    CLOSED: [2021-12-17]
+   Results: [[file:CrossCompilationBlogTutorial/]]
 *** DONE Android
     CLOSED: [2021-12-17]
-    - https://log.zw3rk.com/posts/2017-05-30-a-haskell-cross-compiler-for-android/
     - Binary cross compiler not available on http://hackage.mobilehaskell.org/
 *** DONE iOS
     CLOSED: [2021-12-17]
-    [[file:CrossCompilationBlogTutorial/]]
     - Installed xcode.
     - Downloaded cross compiler.
     - Created scripts.
