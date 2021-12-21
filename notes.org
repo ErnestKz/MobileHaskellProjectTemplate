@@ -1,3 +1,9 @@
+Description of llvmng and bitcode and backend for haskell
+https://mail.haskell.org/pipermail/ghc-devs/2017-September/014689.html
+
+Talk about cross comp
+https://www.youtube.com/watch?v=46A02obKt8g&list=PLbjcAmsCYuS4xspQb5BHnIHhi4BrWteGz&index=7
+
 ** Haskell Cabal and Cross Compilation of Libraries
    https://log.zw3rk.com/posts/2017-05-19-ghc-s-cross-compilation-pipeline/
 *** Cabal Cross Compilation
@@ -72,4 +78,259 @@ it is a flake because it contains a file names flake.nix
     - CI tests
 
 ** Bulding a Cross Compiler
-   - Scan which resource would be useful.
+   - Scan which resources and blog posts would be useful.
+     - Can try summarise the zw3rk blog updates. https://log.zw3rk.com/       
+*** zw3rk Blog
+**** 2021
+     https://log.zw3rk.com/posts/2021-06-28-off-by-one/
+     - Story about static linker for Mach-O file format on AArch64.
+**** 2018
+***** Q1 Jan - March
+     https://log.zw3rk.com/posts/2018-01-09-what-is-new-in-cross-compiling-haskell/
+     - Talks about providing cross compiler binaires on hackage.mobilehaskell.org
+     
+     https://log.zw3rk.com/posts/2018-01-12-talk-building-android-apps-with-haskell/
+     - Talk about building Android apps with Haskell.
+     
+     https://log.zw3rk.com/posts/2018-01-17-provisioning-a-nixos-server-from-macos/
+     - Talks about hosting hackage.mobilehaskell.org
+     - Talks changes in https://github.com/mobilehaskell/hackage-overlay being reflected in hackage.mobilehaskell.org
+     - Bulding on some build machine, and then uploading to the server.
+       
+     https://log.zw3rk.com/posts/2018-02-05-what-is-new-in-cross-compiling-haskell/
+     - Talks overlays in the repo being reflected in the server.
+     - Talks about writing a patch/fix for cabal so that it works better for cross-compilation
+       - So that it propagates the --with-PROG flags into dependencies.
+	 - This must be things like:
+	   --with-ghc=arm-linux-gnueabihf-ghc
+           --with-ghc-pkg=arm-linux-gnueabihf-ghc-pkg
+           --with-gcc=arm-linux-gnueabihf-clang
+           --with-ld=arm-linux-gnueabihf-ld
+     - Talks about SLURP and Uncurated Hackage Layer
+       
+     https://log.zw3rk.com/posts/2018-03-02-what-is-new-in-cross-compiling-haskell/
+     - Talks about cabal --with-PROG file properly respected when using new-build
+     - Talks about working for IOHK
+       - Assisting DevOps team Cross Compile Haskell with GHC
+	 - From Windows to Linux
+       - Says will broaden and improve GHC's cross compilation capabilites.
+
+     - Talks about being on a good road getting all sorted in GHC 8.6
+     - Hopes that GHC 8.6 can be built by default with the shake based build system
+       - hadrian will have extenseive cross compilation capabilites for various platforms.
+     - Talks about work done making haskell cross compile from linux to windows:
+       - https://twitter.com/angerman_io/status/969546657141420032	 
+     
+     https://log.zw3rk.com/posts/2018-03-14-talk-case-study-cross-compiling-dhall-json/
+     - Gave a talk about how to cross compile dhall-json to raspberry pi.
+       - Cross compile non trivial haskell packages and that issues such as
+	 - ghc-head
+	 - build-type
+	 - Template Haskell
+       - Have mostly trivial fixes of which most can be upstreamed.
+     - Talk coincided with release of GHC 8.4 and release of new zlib package to hackage.
+       - renders the fix to zlib unnecessary
+     - Fix for contravarient crude.
+     
+***** Q2 April - June
+     https://log.zw3rk.com/posts/2018-05-03-what-is-new-in-cross-compiling-haskell/
+     - Talks about finished hadrian PRs
+       - Now can build relocatable GHCs with hadrian by default.
+
+     - Windows compilation can now be done via WINE
+       - Don't need windows installation with iserv
+       - Just run iserv via WINE
+
+     - Talks about working with nix and limitations with respect to cross compilation.
+       - Specifically flattening of conditionals (os/arch/flags) that cabal2nix does.
+	 - This resulted in new tooling:
+	   - https://github.com/input-output-hk/nix-tools
+	   - https://github.com/angerman/haskell.nix
+	   - https://github.com/input-output-hk/hackage.nix
+	   - https://github.com/input-output-hk/stackage.nix
+       - Will expand on this later.
+     - Looked into adding -target to GHC.
+       - Says very long road
+       - Not only changes to GHC but also to build system, to build relevant libraries in the right places
+	 - As well as to the tooling around
+     
+     https://log.zw3rk.com/posts/2018-06-06-what-is-new-in-cross-compiling-haskell/
+     - Talks about fixing load command size limit on macOS
+
+     - Spent more time looking at -target but nothing useful to report yet.
+     - Started looking on the llvm-ng backend, making it ready for the ghc 8.6.1 release.
+       - Included adapting new code gen paths for new primops in 8.6.1
+     - Trying to speedup llvm-ng backend
+     - Hope to provide prebuilt cross compiler binaries for 8.6.1
+       
+     - release of obelisk
+***** Q3 July - September
+     https://log.zw3rk.com/posts/2018-07-04-what-is-new-in-cross-compiling-haskell/
+     - Adpating the llvm-ng backend to build a fresh set of pre-built 8.6.1 cross compilers.
+     
+     https://log.zw3rk.com/posts/2018-08-14-what-is-new-in-cross-compiling-haskell/
+     - Playing with -target
+       - Believes that best solution is to have minmimal ghc that doesn't ship with any libs.
+         - All libs should be built on demand per target.
+	 - Likely want to pre-build and ship the Runtime System Library rts as do not have cabal package that would build the rts.
+	   - Would need partial target toolchain to build the rts for all the bundled rtss to be shipped.
+
+     - Other side, likely want to use iserv e.g the -fexternal-interpreter
+       - Run into some strange behaviour while compiling test-suite packages
+	 - iserv complains code loaded multiple times.
+	 - exploring how to get proper test-coverage for libraries
+	   - even ghc in a cross compiled setting
+
+     - Fixed -staticlib argument doesn't fail if object files in the archives it's trying to concat are odd-length
+       - GHC doesn't panic anymore when -jN, N>1 is used and it fails to find/load a library.
+	 
+     - llvmng code to work with ghc8.6, retraced performance imporovement
+     - Use aws compute time to build cross compiler once the final 8.6.1 hits. (must be talking about windoes here)
+
+***** Q4 Oct - Dec
+     https://log.zw3rk.com/posts/2018-10-09-what-is-new-in-cross-compiling-haskell/
+     - llvm-ng, cmm, custom ghc, dump cmm
+       - decoupling code generator end ghc front end
+     - Usually
+       - GHC reads file
+       - Turns into AST
+       - Desugares
+       - Runs Optimizations
+       - Turns into STG
+       - Turns into cmm
+     - so far cmm wasn't binary serilaizable
+       - had to plug code generator in ghc
+	 - and have frontend run
+	   - then call code gen
+     - talks about minimalst ghc, ghc should be packaged with:
+       - rts
+       - ghc
+       - ghc-prim
+       - integer-gmp
+       - integer-simple
+       - base
+       - array
+       - deepest
+     - which means Cabal needs to be bootstrapped
+     - prefer to get rid of template-haskell
+       - however ghc is linked against it
+       - not shipping and reinstalling different, would potentially break things depending on TH
+     - a way around, to use external interpreter only
+       - could recompile external interpreter against your changed TH library.
+	 
+     - ghc will likely ignore {-# ANN ... "HLint: ... #-} and provide {-# HLINT ... #-} pragma.
+
+     - would like to get minimal ghc dist working for -target first
+**** 2017
+***** Q2 April - June
+      https://log.zw3rk.com/posts/2017-04-20-hello-world-and-a-cross-compilation-survey/
+      Survey
+
+      https://log.zw3rk.com/posts/2017-05-03-building-iconv-for-android/
+      check <-
+      
+      https://log.zw3rk.com/posts/2017-05-09-cross-compilation-survey-results/
+      Survey
+
+      https://log.zw3rk.com/posts/2017-05-10-quick-headless-raspberry-pi-setup/
+
+      https://log.zw3rk.com/posts/2017-05-11-making-a-raspbian-cross-compilation-sdk/
+
+      https://log.zw3rk.com/posts/2017-05-16-a-haskell-cross-compiler-for-raspberry-pi/
+
+      https://log.zw3rk.com/posts/2017-05-17-the-haskell-cabal-and-cross-compilation/
+
+      https://log.zw3rk.com/posts/2017-05-18-why-use-a-cross-compiler/
+      Why use cross compiler
+
+      https://log.zw3rk.com/posts/2017-05-19-ghc-s-cross-compilation-pipeline/
+      check <-
+
+      https://log.zw3rk.com/posts/2017-05-23-template-haskell/
+      th <- 
+      
+      https://log.zw3rk.com/posts/2017-05-24-template-haskell-and-cross-compilation/
+      th <- 
+
+      https://log.zw3rk.com/posts/2017-05-25-cross-compiling-template-haskell/
+      th <-
+      
+      https://log.zw3rk.com/posts/2017-05-27-cross-compiling-yesod-to-raspberry-pi/
+
+      https://log.zw3rk.com/posts/2017-05-30-a-haskell-cross-compiler-for-android/
+      check <- 
+
+      https://log.zw3rk.com/posts/2017-05-31-android-and-template-haskell/
+      th <- 
+
+      https://log.zw3rk.com/posts/2017-06-02-what-is-new-in-cross-compiling-haskell/
+      This contains some highlights and summaries.
+
+      https://log.zw3rk.com/posts/2017-06-06-a-haskell-cross-compiler-for-ios/
+      check <- 
+
+      https://log.zw3rk.com/posts/2017-06-07-ios-and-template-haskell/
+      th <- 
+***** Q3 July - September
+      https://log.zw3rk.com/posts/2017-07-06-what-is-new-in-cross-compiling-haskell/
+      Some summary
+
+      https://log.zw3rk.com/posts/2017-08-03-what-is-new-in-cross-compiling-haskell/
+      Figuring out how to buld distirbutable binaries of GHC cross compilers
+
+      https://log.zw3rk.com/posts/2017-09-05-what-is-new-in-cross-compiling-haskell/
+      - Bulding llvm backend, integrating llvm bitcode backend into ghc.
+      - -fllvmng backend can compile GHC, but fails to validate
+***** Q4 Oct - Dec
+      https://log.zw3rk.com/posts/2017-10-08-what-is-new-in-cross-compiling-haskell/
+      - ICFP, cross compilation diffs merged
+      - Q monad extension for TH ajdustments
+      - announcement of head.hackage overlay
+	- allows to have set of patches which are turned into separate hackage repo
+	- patches picked from repo rather than from upstream hackage repo if a patched package exists
+	- hackage overlay patches the packages on the server side and provide separate hackage repo
+	  - which takes prescedence over the upstream hackage repo
+      - built hackage.mobilehaskell.org
+	- so far a single patched package, zlib
+	- https://github.com/mobilehaskell/hackage-overlay
+        - also contains jexperimental ghc binary dists, built with llvmng llvm backend
+	  
+
+      https://log.zw3rk.com/posts/2017-10-20-ghc-cross-compiler-binary-distributions/
+      <- check (outdated using make?)
+
+      https://log.zw3rk.com/posts/2017-10-30-building-ghc-the-package-database/
+      ghc's build system and ghc-pkg
+
+      https://log.zw3rk.com/posts/2017-11-11-what-is-new-in-cross-compiling-haskell/
+      - ghc 8.4.1 is comming
+        - come with a shake based build system called hadrian
+	- make based build system will eventually be dropped.
+
+      - after investigating make, bit the bullet and went with hadrian
+
+      - gonna write about GHCs build system
+
+      - ideal cross compiler contains a bin and lib folder, simply unpacking and running bin/ghc.
+	- requires the distribution is relocatable.
+      - to achieve this, would be great if the build system would place the package database relocateable into lib and the binaries into bin
+      - created a fat PR into hadrian to make it possible
+	
+
+      https://log.zw3rk.com/posts/2017-11-11-building-ghc-the-tools/
+      <- check -- tools to build GHC
+      
+      https://log.zw3rk.com/posts/2017-11-22-building-ghc-the-stages/
+      <- check -- GHC build stages
+
+      https://log.zw3rk.com/posts/2017-12-08-what-is-new-in-cross-compiling-haskell/
+      - was workingon hadrian fork to allow building relocatable binary distributions for GHC, specifically for cross compilers
+      - will update hackage.mobilehaskell.org with these builds
+      - alp mestangullari taking over branch, hoping merge chunks of branch into upstream hadrian
+
+      https://log.zw3rk.com/posts/2017-12-20-relocatable-ghc-cross-compiler-binary-distributions/
+      <- check -- talk about relocatable binary dist
+
+      https://log.zw3rk.com/posts/2017-12-21-contributing-to-ghc/
+      contributing to ghc
+      
