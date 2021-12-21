@@ -1,6 +1,5 @@
-** Haskell Cabal and Cross Compilation
-https://log.zw3rk.com/posts/2017-05-19-ghc-s-cross-compilation-pipeline/
-
+** Haskell Cabal and Cross Compilation of Libraries
+   https://log.zw3rk.com/posts/2017-05-19-ghc-s-cross-compilation-pipeline/
 *** Cabal Cross Compilation
 https://log.zw3rk.com/posts/2017-05-17-the-haskell-cabal-and-cross-compilation/
 cabal will use a non-prefixed toolchain, which results in the library being compiled for the build machine.
@@ -18,9 +17,6 @@ cabal provides the cnecessary arguments to pass in the toolchain.
 --configure-option=--host=arm-linux-gnueabihf
 
 https://github.com/ghc-ios/ghc-ios-scripts
-
-
-
 
 ** GHC and Libraries
 https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/packages.html
@@ -74,3 +70,6 @@ it is a flake because it contains a file names flake.nix
     - Nix packages
     - NixOS modules
     - CI tests
+
+** Bulding a Cross Compiler
+   - Scan which resource would be useful.

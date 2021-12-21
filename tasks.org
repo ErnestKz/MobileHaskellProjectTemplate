@@ -15,7 +15,8 @@
     - Setup xcode to link app.
     - Ran app.
       
-** IN_PROGRESS Compile Haskell with libraries, using most straightforward approach
+** DONE Compile Haskell with libraries, using most straightforward approach
+   CLOSED: [2021-12-21 Tue 12:26]
 Using cabal and cross-compilation flags.
 https://log.zw3rk.com/posts/2017-05-17-the-haskell-cabal-and-cross-compilation/
 https://github.com/ghc-ios/ghc-ios-scripts
@@ -23,16 +24,20 @@ https://github.com/ghc-ios/ghc-ios-scripts
 Morritz tool-chain wrapper has the wrapped ld, clang, it also has cabal, so no need to use ghc-ios-scripts.
 
 Seems like need patched ld to link against the mobile OS libraries.
+
+Package resolver quite essential for wide range of users.
 *** DONE Create a HTTP request with a haskell HTTP library.
     CLOSED: [2021-12-20 Mon 16:41]
     [[file:CrossCompilationBlogTutorial/iOSProjectCabal/]]
-*** TODO Perfrom SQLite operations with Haskell SQLite library.
+*** DONE Perfrom SQLite operations with Haskell SQLite library.
+    CLOSED: [2021-12-21 Tue 12:26]
     - Adding the 'sqlite' library fails to compile due to an ambiguos function usage error (with a function (namely <>) from base). 
     - Although when compiling for a newer ghc, it doesn't get that error. This could be because cabal used a base for ghc 8.4.0 that was different for  ghc 8.10.0.
 
     - Seems vital to be able to have flexible ghc versions so that it can integrate fully with the package resolver eco system.
     - Got 'direct-sqlite' to compile and link. Although haven't properly tried creating a database, but for now assuming that it's enough.
-*** Attempt to compile simplex libraries and observe blocks.
+*** DONE Attempt to compile simplex libraries and observe blocks.
+    CLOSED: [2021-12-21 Tue 12:26]
     - https://github.com/simplex-chat/simplexmq/tree/v5-ghc844
       - This branch is made to be compatible with GHC 8.4.4
       - The .cabal file generated for this stack project does not compile for GHC 8.4.0
@@ -44,10 +49,12 @@ Seems like need patched ld to link against the mobile OS libraries.
       - GHC version 8.4.0 does not support BlockArguments
     - I havan't gotten to the point of the error, but there it's highly likely that template haskell would stop me from compiling the project as well.
       
-** Compile a GHC Cross Compiler of arbitrary versions
-** UNREFINED_TASK Create a 'compiling a cross compiler for mobile' Wiki entry.
-*** UNREFINED_TASK Things involved when compiling Haskell and what are the relevant steps for cross compile for a platform.
-** UNREFINED_TASK Create/Gather scripts for compiling a cross compiler.
+
+** IN_PROGRESS Compling GHC Cross Compiler of arbitrary versions
+*** IN_PROGRESS Compile a GHC Cross Compiler of arbitrary versions
+- Create/Gather scripts for compiling a cross compiler.
+*** UNREFINED_TASK Create a 'compiling a cross compiler for mobile' Wiki entry.
+- Things involved when compiling Haskell and what are the relevant steps for cross compile for a platform.
 
 ** UNREFINED_TASK Create a 'dealing with Template Haskell' Wiki entry.
 ** UNREFINED_TASK Create a 'using Haskell libraries' Wiki entry.
