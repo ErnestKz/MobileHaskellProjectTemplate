@@ -10,6 +10,8 @@ library
 
     build-depends:    base
                     , HTTP
+                    -- , sqlite
+                    , direct-sqlite
                       
     -- hs-source-dirs:   lib
     default-language: Haskell2010
