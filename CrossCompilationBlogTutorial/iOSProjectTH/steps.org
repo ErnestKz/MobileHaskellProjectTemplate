@@ -1,0 +1,25 @@
+git clone --recursive git://git.haskell.org/ghc.git
+cd ghc/utils/iserv/
+ghc/utils/remote-iserv
+
+
+
+./boot
+
+./configure
+
+./configure CC=clang --with-curses-includes=/usr/local/opt/ncurses/include --with-curses-libraries=/usr/local/opt/ncurses/lib
+
+
+--with-curses-includes  directory containing curses headers
+
+  --with-curses-libraries directory containing curses libraries
+
+cd /ghc/libraries/libiserv/
+cabal v1-install -fnetwork
+cd /ghc/utils/proxy-iserv
+cabal v1-install -flibrary -fproxy
+cabal v1-build
+
+ghc-pkg list | grep iserv
+ghc-pkg unregister <pkgname>

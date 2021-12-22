@@ -1,0 +1,6 @@
+build
+lib
+lib_arm
+lib_x86
+ghc-8.10.7
+ghc-8.10.7-src.tar.xz
