@@ -52,11 +52,16 @@ Package resolver quite essential for wide range of users.
 
 ** IN_PROGRESS Compling GHC Cross Compiler of arbitrary versions
 *** IN_PROGRESS Compile a GHC Cross Compiler of arbitrary versions
+- Understand the process of compilation through the blogs [[file:notes.org::*zw3rk Blog][zw3rk Blog]]. 
 - Create/Gather scripts for compiling a cross compiler.
 *** UNREFINED_TASK Create a 'compiling a cross compiler for mobile' Wiki entry.
 - Things involved when compiling Haskell and what are the relevant steps for cross compile for a platform.
 
-** UNREFINED_TASK Create a 'dealing with Template Haskell' Wiki entry.
+** IN_PROGRESS Handle Template Haskell
+*** IN_PROGRESS Implement zw3rk template haskell solutions for iOS.
+*** TODO Implement zw3rk template haskell solutions for Android.
+*** UNREFINED_TASK Create a 'dealing with Template Haskell' Wiki entry.
+
 ** UNREFINED_TASK Create a 'using Haskell libraries' Wiki entry.
 ** UNREFINED_TASK Create a 'common OS Haskell interop patches' Wiki entry, detailing how to patch a library to work for mobile.
 ** UNREFINED_TASK Create a 'Worflow for compiling and developing mobile Haskell projects' wiki entry.
