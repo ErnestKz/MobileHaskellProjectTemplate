@@ -4,6 +4,55 @@ https://mail.haskell.org/pipermail/ghc-devs/2017-September/014689.html
 Talk about cross comp
 https://www.youtube.com/watch?v=46A02obKt8g&list=PLbjcAmsCYuS4xspQb5BHnIHhi4BrWteGz&index=7
 
+** Template Haskell
+*** iserv-proxy and GHCSlave
+- Need to acquire iserv-proxy program that runs on the build machine.
+  - the iserv-proxy can be obtained from the ghc source tree.
+  - within ghc/utils/remote-proxy
+    - to build, need to run ./boot && ./configure <options> in ghc/
+    - then go to ghc/utils/remote-proxy and then run make
+    - this takes a long time
+
+- Are there any caches available?
+  - The dependency of remote-iserv on the main branch 9.3 is just libiserv
+  - libiserv might be on hackage and therefore available in the nixpkgs cache
+  - 9.0.1 is available https://hackage.haskell.org/package/libiserv
+  - looks like libiserv comes with ghc, so maybe just need to get the 8.10.7 branch up
+    - Correct that don't need to compile ghc, but looks like remote-proxy library depends on a module that doesn't exist.
+      - i.e Remote.Message
+
+  - So probably will need to look for a version of haskell that has a Remote.Message module.
+    - Although libiserv does include the Remote.Message module, maybe cause I'm using nix?
+      - Wasnt exactly cause of nix, the 
+      
+    
+- Need to acquire GHCSlave program that runs on target.
+  - https://github.com/zw3rk/ghc-slave
+  - Doesn't look to much to build
+
+
+
+
+
+*** 
+
+https://github.com/input-output-hk/haskell.nix
+
+** Haskell Build System
+https://gitlab.haskell.org/ghc/ghc/-/wikis/building/architecture
+https://gitlab.haskell.org/ghc/ghc/-/wikis/building/hadrian
+https://gitlab.haskell.org/ghc/ghc/-/wikis/building/preparation
+https://gitlab.haskell.org/ghc/ghc/blob/master/hadrian/doc/make.md
+https://gitlab.haskell.org/ghc/ghc/-/blob/master/hadrian/README.md
+
+
+https://gitlab.haskell.org/ghc/ghc/-/wikis/building/using
+https://gitlab.haskell.org/ghc/ghc/-/wikis/contributing
+https://gitlab.haskell.org/ghc/ghc/-/wikis/building#building-and-porting-ghc
+
+
+
+
 ** Haskell Cabal and Cross Compilation of Libraries
    https://log.zw3rk.com/posts/2017-05-19-ghc-s-cross-compilation-pipeline/
 *** Cabal Cross Compilation
@@ -254,6 +303,24 @@ it is a flake because it contains a file names flake.nix
 
       https://log.zw3rk.com/posts/2017-05-25-cross-compiling-template-haskell/
       th <-
+
+      - GHCs external interpreter, splits ghc into 2 components
+	- ghc
+	- interpreter server iserv
+      - Passing -fexternal-interpreter to ghc will spawn an iserv instance and run interpreted code through it.
+      - ghc instruct iserv to load and link libraries as needed, and eval bytecode objects.
+      - iserv can query ghc for current compilation env during eval.
+
+      - split iserv into two parts
+	- iserv-proxy , serves as iserv interface to GHC on the build machine.
+	- GHCSlave , on the target machine
+
+      - first need a cross compiler
+
+      - Building iserv
+	- iserv-proxy is built with the build machine ghc as it runs on the build machine
+	- iserv-bin, which contains iserv-proxy of the ghc tree can be found in iserv subfolder of ghc
+	  
       
       https://log.zw3rk.com/posts/2017-05-27-cross-compiling-yesod-to-raspberry-pi/
 
@@ -270,7 +337,16 @@ it is a flake because it contains a file names flake.nix
       check <- 
 
       https://log.zw3rk.com/posts/2017-06-07-ios-and-template-haskell/
-      th <- 
+      th <-
+
+      - Wrap GHCSlave (remote iserv) instance into an application for iOS.
+      - Build the GHCSlave iOS application with the iOS cross compiler.
+
+      - Build iserv-proxy. (Cross Compiling Template Haskell)
+
+      - Build iserv library.
+	
+      
 ***** Q3 July - September
       https://log.zw3rk.com/posts/2017-07-06-what-is-new-in-cross-compiling-haskell/
       Some summary
@@ -333,4 +409,6 @@ it is a flake because it contains a file names flake.nix
 
       https://log.zw3rk.com/posts/2017-12-21-contributing-to-ghc/
       contributing to ghc
+      
+
       
