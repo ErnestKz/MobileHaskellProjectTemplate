@@ -62,6 +62,7 @@ Package resolver quite essential for wide range of users.
 *** TODO Implement zw3rk template haskell solutions for Android.
 *** UNREFINED_TASK Create a 'dealing with Template Haskell' Wiki entry.
 
+
 ** UNREFINED_TASK Create a 'using Haskell libraries' Wiki entry.
 ** UNREFINED_TASK Create a 'common OS Haskell interop patches' Wiki entry, detailing how to patch a library to work for mobile.
 ** UNREFINED_TASK Create a 'Worflow for compiling and developing mobile Haskell projects' wiki entry.
@@ -69,3 +70,4 @@ Package resolver quite essential for wide range of users.
 ** UNREFINED_TASK Create Github CI workflow for compiling projects.
 ** UNREFINED_TASK Create nix expression for compiling cross compilers.
 ** UNREFINED_TASK Create nix cache service for Haskell mobile packages and compilers.   
+** UNREFINED_TASK Investigate performance and binary size properties and how to improve performance and reduce size
