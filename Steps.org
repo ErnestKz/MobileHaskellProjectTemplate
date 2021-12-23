@@ -1,0 +1,20 @@
+* Steps to compile an iOS cabal project without Template Haskell support on an Intel Macbook.
+
+- There may be errors that some dependencies on your machine is missing, if so, download the dependencies, usually with the brew tool.
+
+Scripts to download the ghc cross compiler and dependencies are available in the CrossCompilationBlogTutorial directory.
+
+#+begin_src sh
+  cd ./CrossCompilationBlogTutorial
+  source ./darwin_x86_download_binaries.sh # Download dependencies
+  source ./darwin_x86_export_paths.sh      # Setup paths for the shell session
+#+end_src
+
+#+begin_src sh
+  cd ./iOSProjectCabal/hs/ 	# Example cabal project.
+  source compile.sh		# This will compile the cabal project and create a liba.a in the lib folder, which ready to be used in the xcode iOS simulator.
+#+end_src
+
+- Open the iOSProjectCabal project with xcode and then start then run the program.
+  - XCode knows about the libraries to link against as the project has been set up that way.
+    - To see how to set up the project from scratch, steps are available [[file:CrossCompilationBlogTutorial/iOSProject/xcode_setup_images/]]

@@ -1,6 +1,24 @@
 Description of llvmng and bitcode and backend for haskell
 https://mail.haskell.org/pipermail/ghc-devs/2017-September/014689.html
 
+macOS where the mach-o format is used
+the linker uses a feature called 'subsections_via_symbols' to strip dead code
+- works by assuming all code bwteen two symbols belongs to the first symbol
+
+stripper deletes the code of symbol if it determines the symbol is not used
+so it deletes all the code below the symbol until the next symbol
+
+ghc uses table next to code with 'prefixdata' in llvm feature which puts data before the symbol about the symbol
+
+so cant strip any code produced by ghc on mac or macos
+
+looks like the motivation for the llvmng and bitcode backend was make the binaries smaller.
+
+
+** Mach-O
+https://en.wikipedia.org/wiki/Mach-O
+
+
 Talk about cross comp
 https://www.youtube.com/watch?v=46A02obKt8g&list=PLbjcAmsCYuS4xspQb5BHnIHhi4BrWteGz&index=7
 
@@ -24,19 +42,17 @@ https://www.youtube.com/watch?v=46A02obKt8g&list=PLbjcAmsCYuS4xspQb5BHnIHhi4BrWt
   - So probably will need to look for a version of haskell that has a Remote.Message module.
     - Although libiserv does include the Remote.Message module, maybe cause I'm using nix?
       - Wasnt exactly cause of nix, the 
-      
+*** iserv
+- need to cross compile iserv so that i have iserv-exe
+  - cross compiler version is 8.4.0 but only 8.4.1 source distribution is available
+  - run into an error where there is a missing header file, maybe the ghc 8.4.0 version doesn't ship with the header
+    - had to change the path from a relative one to a absoulute one in /isrev/cbits/iservmain.c 
     
 - Need to acquire GHCSlave program that runs on target.
   - https://github.com/zw3rk/ghc-slave
   - Doesn't look to much to build
 
-
-
-
-
-*** 
-
-https://github.com/input-output-hk/haskell.nix
+ 
 
 ** Haskell Build System
 https://gitlab.haskell.org/ghc/ghc/-/wikis/building/architecture
@@ -180,7 +196,7 @@ it is a flake because it contains a file names flake.nix
      - Talk coincided with release of GHC 8.4 and release of new zlib package to hackage.
        - renders the fix to zlib unnecessary
      - Fix for contravarient crude.
-     
+       
 ***** Q2 April - June
      https://log.zw3rk.com/posts/2018-05-03-what-is-new-in-cross-compiling-haskell/
      - Talks about finished hadrian PRs
@@ -342,11 +358,21 @@ it is a flake because it contains a file names flake.nix
       - Wrap GHCSlave (remote iserv) instance into an application for iOS.
       - Build the GHCSlave iOS application with the iOS cross compiler.
 
-      - Build iserv-proxy. (Cross Compiling Template Haskell)
+      - Build iserv-proxy. -> this is to run on the build machine
 
-      - Build iserv library.
-	
-      
+      - Build iserv library. -> this is to run on the target machine
+	- ghc/iserv $ aarch64-apple-ios-cabal install -flibrary
+        - ghc/iserv $ x86_64-apple-ios-cabal install -flibrary
+      - clone the cross compiler ghc version, need donwload that source distribution
+
+      - Need to build stati library and wrap it into a native iOS app.
+	- Code for the slave app can be found in the iOS folder of ghc-slave
+#+begin_src sh
+  aarch64-apple-ios-ghc -odir arm64 -hidir arm64 -staticlib -threaded -lffi -L/path/to/libffi/aarch64-apple-ios/lib -o hs-libs/arm64/libhs.a -package iserv-bin hs/LineBuff.hs
+  x86_64-apple-ios-ghc -odir x86_64 -hidir x86_64 -staticlib -threaded -lffi -L/path/to/libffi/x86_64-apple-ios/lib -o hs-libs/x86_64/libhs.a -package iserv-bin hs/LineBuff.hs
+  lipo -create -output hs-libs/libhs.a hs-libs/arm64/libhs.a hs-libs/x86_64/libhs.a
+  # we need -threaded as the startSlave function calls forkIO to start the slave in a separate thread
+#+end_src
 ***** Q3 July - September
       https://log.zw3rk.com/posts/2017-07-06-what-is-new-in-cross-compiling-haskell/
       Some summary
