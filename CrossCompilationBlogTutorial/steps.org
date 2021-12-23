@@ -1,4 +1,0 @@
-cabal-install is required
-
-libgmp.dylib is required
-brew install gmp
