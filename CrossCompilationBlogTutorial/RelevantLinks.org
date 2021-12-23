@@ -1,6 +1,7 @@
 Creating some scripts and following steps of:
 - https://log.zw3rk.com/posts/2017-06-06-a-haskell-cross-compiler-for-ios/
 - https://log.zw3rk.com/posts/2017-05-30-a-haskell-cross-compiler-for-android/
+- https://log.zw3rk.com/posts/2017-05-17-the-haskell-cabal-and-cross-compilation/
 
 Relevant links:
 - https://github.com/zw3rk/hs-ios-helloworld
