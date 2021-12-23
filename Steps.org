@@ -12,9 +12,10 @@ Scripts to download the ghc cross compiler and dependencies are available in the
 
 #+begin_src sh
   cd ./iOSProjectCabal/hs/ 	# Example cabal project.
-  source compile.sh		# This will compile the cabal project and create a liba.a in the lib folder, which is ready to be used in the xcode iOS simulator.
+  source compile.sh		# This will compile the cabal project and create a liba.a in the ../lib folder, which is ready to be used in the xcode iOS simulator.
 #+end_src
 
 - Open the iOSProjectCabal project with xcode and then start the iOS program.
   - XCode knows about the libraries to link against as the project has been set up that way.
     - To see how to set up the project from scratch, steps are available [[file:CrossCompilationBlogTutorial/iOSProject/xcode_setup_images/]]
+      - In the images, the library that is being linked against is libhs.a, in this example the library is called liba.a.
