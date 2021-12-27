@@ -53,7 +53,6 @@ https://www.youtube.com/watch?v=46A02obKt8g&list=PLbjcAmsCYuS4xspQb5BHnIHhi4BrWt
   - Doesn't look to much to build
 
  
-
 ** Haskell Build System
 https://gitlab.haskell.org/ghc/ghc/-/wikis/building/architecture
 https://gitlab.haskell.org/ghc/ghc/-/wikis/building/hadrian
@@ -65,7 +64,6 @@ https://gitlab.haskell.org/ghc/ghc/-/blob/master/hadrian/README.md
 https://gitlab.haskell.org/ghc/ghc/-/wikis/building/using
 https://gitlab.haskell.org/ghc/ghc/-/wikis/contributing
 https://gitlab.haskell.org/ghc/ghc/-/wikis/building#building-and-porting-ghc
-
 
 
 
@@ -438,3 +436,133 @@ it is a flake because it contains a file names flake.nix
       
 
       
+
+** The toolchain wrappers
+https://github.com/zw3rk/toolchain-wrapper <- most recently commited to
+https://github.com/ghc-ios/ghc-ios-scripts 
+*** toolchain-wrapper / ghc iOS scripts
+- ghc iOS scripts talks about the stubs.
+
+- So these are mainly intended for iOS, but toolchain-wrapper has stuff for
+  - RaspberryPi (arm-linux-gnueabihf)
+  - Android (armv7-linux-anroideabi, aarch64-linux-android)
+  - iOS (x86_64-apple-ios, aarch64-apple-ios)
+
+- Wrapped commands are:
+  - gcc
+  - clang
+  - ld
+  - ld.gold
+  - nm
+  - ar
+  - ranlib
+  - cabal
+
+- xcode is a dependency
+
+
+- wrapper is the core script
+  - it reads its own program name (command, and target) and maps them to the (command and arguments)
+#+begin_src sh
+targets="arm-linux-gnueabihf x86_64-linux-android armv7-linux-androideabi aarch64-linux-android x86_64-apple-ios aarch64-apple-ios wasm32-unknown-unknown-wasm aarch64-apple-darwin arm64-apple-darwin"
+commands="clang ld ld.gold nm ar ranlib cabal llvm-dis llvm-nm llvm-ar"
+#+end_src    
+- boostrap creates program names and symlinks them to the wrapper
+
+
+When the command name matches cabal:
+#+begin_src sh
+  ,*-cabal)
+	  fcommon="--builddir=dist/${target}"
+	  fcompile=" --with-ghc=${target}-ghc"
+	  fcompile+=" --with-ghc-pkg=${target}-ghc-pkg"
+	  fcompile+=" --with-gcc=${target}-clang"
+	  fcompile+=" --with-ld=${target}-ld"
+	  fcompile+=" --with-hsc2hs=${target}-hsc2hs"
+	  fcompile+=" --hsc2hs-options=--cross-compile"
+	  fconfig="--disable-shared --configure-option=--host=${target}"
+	  case $1 in
+	      configure|install) flags="${fcommon} ${fcompile} ${fconfig}" ;;
+	      build)             flags="${fcommon} ${fcompile}" ;;
+	      new-configure|new-install) flags="${fcompile} ${fconfig}" ;;
+	      new-build)         flags="${fcompile}" ;;
+	      list|info|update)  flags="" ;;
+	      "")                flags="" ;;
+	      *)                 flags=$fcommon ;;
+	  esac;;
+#+end_src
+
+When the command matches hsc2hs:
+#+begin_src sh
+*-hsc2hs) flags=" --cross-compile" ;;
+#+end_src
+
+When the command matches various apples:
+#+begin_src sh
+  # iOS -- this us run though apples xcrun tool.
+
+  aarch64-apple-ios-clang|aarch64-apple-ios-ld)
+	  flags="--sdk iphoneos ${cmd} -arch arm64"
+	  cmd="xcrun" ;;
+
+  aarch64-apple-ios-*|aarch64-apple-ios-*)
+	  flags="--sdk iphoneos ${cmd}"
+	  cmd="xcrun" ;;
+
+  # iOS (64bit simulator)
+  x86_64-apple-ios-clang|x86_64-apple-ios-ld)
+	  flags="--sdk iphonesimulator ${cmd} -arch x86_64"
+	  cmd="xcrun" ;;
+
+  x86_64-apple-ios-*)
+	  flags="--sdk iphonesimulator ${cmd}"
+	  cmd="xcrun" ;;
+
+
+  # looks like these are not for the phone
+  aarch64-apple-darwin-clang|aarch64-apple-darwin-ld|arm64-apple-darwin-clang|arm64-apple-darwin-ld)
+	  flags="--sdk macosx ${cmd} -arch arm64"
+	  cmd="xcrun" ;;
+
+  aarch64-apple-darwin-*|arm64-apple-darwin-*)
+	  flags="--sdk macosx ${cmd}"
+	  cmd="xcrun" ;;
+#+end_src
+
+When the command matches llvm
+#+begin_src sh
+ *-llvm-*|wasm32-*-nm|wasm32-*-ar|wasm32-*-ranlib) cmd="llvm-$cmd" ;;
+#+end_src
+
+When the command matches the other tools:
+#+begin_src sh
+# they retain their original cmd and flags
+*-nm|*-ar|*-ranlib) ;;
+#+end_src
+
+For all apples, it just runs the command:
+#+begin_src sh
+*) exec $cmd $flags "$@" ;;
+#+end_src
+
+$@ refers to all the scripts command line arguments
+
+
+https://github.com/ghc-ios/ghc-ios-scripts/blob/master/ghc-ios
+Shows some examples of the flags used with the ghc's
+** XCode in Nix
+http://sandervanderburg.blogspot.com/2012/12/deploying-ios-applications-with-nix.html
+https://github.com/NixOS/nixpkgs/tree/master/pkgs/os-specific/darwin
+https://github.com/NixOS/nixpkgs/blob/release-21.11/pkgs/top-level/darwin-packages.nix
+https://github.com/svanderburg/nix-xcodeenvtests
+#+begin_src sh
+lrwxr-xr-x  1 sander  staff  94  1 jan  1970 Simulator -> /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app/Contents/MacOS/Simulator
+lrwxr-xr-x  1 sander  staff  17  1 jan  1970 codesign -> /usr/bin/codesign
+lrwxr-xr-x  1 sander  staff  17  1 jan  1970 security -> /usr/bin/security
+lrwxr-xr-x  1 sander  staff  21  1 jan  1970 xcode-select -> /usr/bin/xcode-select
+lrwxr-xr-x  1 sander  staff  61  1 jan  1970 xcodebuild -> /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild
+lrwxr-xr-x  1 sander  staff  14  1 jan  1970 xcrun -> /usr/bin/xcrun 
+#+end_src
+
+** Cabal management
+https://stackoverflow.com/questions/25765893/how-do-i-install-dependencies-when-cross-compiling-haskell-code
