@@ -50,12 +50,14 @@ Package resolver quite essential for wide range of users.
     - I havan't gotten to the point of the error, but there it's highly likely that template haskell would stop me from compiling the project as well.
       
 
-** IN_PROGRESS Compling GHC Cross Compiler of arbitrary versions
-*** IN_PROGRESS Compile a GHC Cross Compiler of arbitrary versions
+** UNREFINED_TASK Compling GHC Cross Compiler of arbitrary versions
+*** UNREFINED_TASK Compile a GHC Cross Compiler of arbitrary versions
 - Understand the process of compilation through the blogs [[file:notes.org::*zw3rk Blog][zw3rk Blog]]. 
 - Create/Gather scripts for compiling a cross compiler.
 *** UNREFINED_TASK Create a 'compiling a cross compiler for mobile' Wiki entry.
 - Things involved when compiling Haskell and what are the relevant steps for cross compile for a platform.
+
+** IN_PROGRESS Understand what the toolchain wrappers are doing
 
 ** IN_PROGRESS Handle Template Haskell
 *** IN_PROGRESS Implement zw3rk template haskell solutions for iOS.

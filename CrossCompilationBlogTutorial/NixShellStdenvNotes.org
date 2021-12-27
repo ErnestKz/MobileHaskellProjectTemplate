@@ -1,3 +1,60 @@
+# Environment for cross compilers.
+# - Download and Setup paths.
+
+# Setup iserv proxy for build machine.
+# - Shell that has iserv proxy.
+
+# Provide expression to build GHCSlave
+# - Cross compile iserv.
+# - Cross compile GHCSlave linking against iserv.
+
+
+need to find out what the toolchain is actually doing
+
+*** commands
+
+#+begin_src shell
+  nix-shell toolchain.nix -A toolchain --pure
+  nix-shell toolchain.nix -A ghc-aarch64 --pure
+#+end_src
+
+#+begin_src shell
+    # nix show-derivation /nix/store/sq8dp07g6qqr9zaswc2rr0d4lgv37sjc-ghc-aarch64.drv
+    nix --extra-experimental-features nix-command show-derivation /nix/store/sq8dp07g6qqr9zaswc2rr0d4lgv37sjc-ghc-aarch64.drv
+#+end_src
+
+nix expression creates a derivation, so just need to evaluate the nix expression to get a derivation
+
+#+begin_src shell
+  nix-build toolchain.nix -A ghc-aarch64
+#+end_src
+
+- will create a symlinmk result in the current directory, pointing to the out path of the derivation
+
+nix-build does two jobs:
+- nix-instantiate: parse and evaulate simple.nix and return the .drv file corresponsing to the parsed derivation set
+
+#+begin_src shell
+  nix-instantiate toolchain.nix -A ghc-aarch64
+#+end_src  
+
+*** weird decompression error
+ek@Ernests-MacBook-Pro CrossCompilationBlogTutorial % tar --version
+tar --version
+bsdtar 3.5.1 - libarchive 3.5.1 zlib/1.2.11 liblzma/5.0.5 bz2lib/1.0.8 
+
+[nix-shell:~/Files/MobileHaskellProjectTemplate/CrossCompilationBlogTutorial]$ tar --version
+tar --version
+tar (GNU tar) 1.34
+Copyright (C) 2021 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by John Gilmore and Jay Fenlason.
+
+
+*** nix-shell Notes
 - nix-shell will build the deps of the specified derivation.
   - but not the derivation itself.
 
@@ -13,7 +70,7 @@
 
 - The shell exits upon non-zero exit code.
 
-*** Stdenv
+*** Stdenv Notes
 #+begin_src nix
 stdenv.mkDerivation {
   name = "libfoo-1.2.3";
