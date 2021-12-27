@@ -59,6 +59,10 @@ Package resolver quite essential for wide range of users.
 
 ** IN_PROGRESS Handle Template Haskell
 *** IN_PROGRESS Implement zw3rk template haskell solutions for iOS.
+**** DONE Compile iserv-proxy
+CLOSED: [2021-12-27 Mon 09:37]
+**** IN_PROGRESS Compile cross compile GHCSlave
+**** IN_PROGRESS Setup Nix expressions for reproducability
 *** TODO Implement zw3rk template haskell solutions for Android.
 *** UNREFINED_TASK Create a 'dealing with Template Haskell' Wiki entry.
 
