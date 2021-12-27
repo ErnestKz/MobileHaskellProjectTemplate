@@ -1,0 +1,41 @@
+- nix-shell will build the deps of the specified derivation.
+  - but not the derivation itself.
+
+- It will then start an interactive shell
+  - In which all environment variables defined by
+    - the derivation path
+  - have been set to their corresponding values.
+  - and the script $stdenv/setup has been sourced
+
+- If the derivation defines the variable shellHook
+  - It will then be run after $stdenv/setup has been sourced.
+
+
+- The shell exits upon non-zero exit code.
+
+*** Stdenv
+#+begin_src nix
+stdenv.mkDerivation {
+  name = "libfoo-1.2.3";
+  ...
+  builder = ./builder.sh;
+}
+#+end_src
+
+Can still use stdenv generic builder.
+#+begin_src shell
+source $stdenv/setup
+
+buildPhase() {
+  echo "... this is my custom build phase ..."
+  gcc foo.c -o foo
+}
+
+installPhase() {
+  mkdir -p $out/bin
+  cp foo $out/bin
+}
+
+genericBuild
+#+end_src
+
