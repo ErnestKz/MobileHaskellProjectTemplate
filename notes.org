@@ -566,3 +566,9 @@ lrwxr-xr-x  1 sander  staff  14  1 jan  1970 xcrun -> /usr/bin/xcrun 
 
 ** Cabal management
 https://stackoverflow.com/questions/25765893/how-do-i-install-dependencies-when-cross-compiling-haskell-code
+** Stages of GHC Compilation
+- clang is failing for cabal
+  - can I manually compile the stage?
+
+- can investigate ghc-pkg
+  - should make a shell    
