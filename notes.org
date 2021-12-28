@@ -571,4 +571,325 @@ https://stackoverflow.com/questions/25765893/how-do-i-install-dependencies-when-
   - can I manually compile the stage?
 
 - can investigate ghc-pkg
-  - should make a shell    
+  - should make a shell
+    
+** mobile-core-log summary
+*** Questions
+- What are statically compiled musl binaries?
+  - What does it mean by not resolving and crashing?
+    - Symbols don't exist?
+    - Why would it crash?
+
+- What are glib compiled binaries?
+  - Are they a universal sort of binary?
+
+- What does it mean by linker64 not being readily available?
+
+- Does architecture difference really affect haskell code execution?
+  - Seems like only if using IO
+  - If not, then just generate TH splices using build machine
+
+- what is darwin_compile.sh doing?    
+*** Reading
+https://github.com/zw3rk/mobile-core-log/blob/master/LOG.md
+
+iOS:
+- build for macOS
+- patch up objects load commands from macOS -> iOS
+  - to get around the linker being overly zelous
+
+Android:
+- Multiple architectures.
+  - For now only focus on aarch64
+    
+- Can't use statically compiled musl binaries
+  - They don't resolve and crash (missing symbols?)
+- Can't use glib compiled binaries
+  - They have more missing symbols
+    
+- Can't use bionic (androids libc) compiled libraries
+  - By default dynamic
+  - linker64 isn't readily available
+
+  - Bulding linker64 from google sources is a pain.
+    - They use a build tool called soong.
+      - It replaced their make files, and will soon be replaced by bazel.    
+    - building soong is barely documented
+
+  - building bionic libc from source requires soong
+    - could construct a makefile      
+
+  - building static libc, libm,... from bionic should allow to build android executables that just run on linux as long as not using android APIs
+  - building linker64 should allow to run android exectuables on linux as long as they don't use androi apis
+          
+- Android
+  - aarch64
+  - aarch32
+  - x86_64
+  - mips
+  - risc-v
+  - maybe others
+
+
+- executable binary
+- machine code
+- container formats
+- linking terminology
+- thoughts on c standard library
+
+
+- code -> assembly printer -assembler-> byte stream of instructions specific to target CPU
+  - x86_64/aarch64
+https://godbolt.org/
+
+- three major container formats for applications
+  - Portable Executable (PE) on Windows
+  - Mainly ELF on windows
+  - Mach-O pretty much exclusively on Apple
+
+- The file formats are what the kernel reads
+  - Decide where and what executable code to place where in memory
+  - Nice to have metadata
+    - allow us to have different sections that describe
+      - machine code (text sections)
+      - data sections (literal strings and stuff)
+- When kernel loads application into memory
+  - it will fux up referenes in the instructions
+    - so that pointers point to the e.g string literals in data section
+
+  - this process is called relocation
+
+
+  - if ELF file
+    - can query relocations with
+      - readelf
+  - mach-o
+    - otool
+  - PE's
+    - probalby some tool as well
+
+  - lib.c -> lib.o (an object file, in container format of OS)
+    - thus wont be identical across different operating systems
+
+  - main.c uses libraries in lib.c
+    - main.o will have symbolic references (symbosl)
+      - to something that's not contained in main.o
+      - can't trun main.o straight into the main executable
+        - we will run into the problem of not being able to call the library function at runtime
+	  - library function will not be able to be found
+
+	- the linker ld will complain about this
+	  - that it cant turn main.o on its own into an executable
+
+	- provide the linker with lib.o and main.o and it will link
+	  - need to provide the object files in a certain order
+
+
+
+  - so we statitcally linked lib.o and mian.o into main
+    - most straigthforward way of linking
+      - allows linker to discard symbols that are not used from the final product
+
+  - dynamic linking and dynamic shared objects (DSOs)
+    - .dll   dynamic link lib
+    - .so    shared object
+    - .dylib dynamic lib
+  - tell the linker to link shared lib
+    - wont include into final exe
+      - exe will reference lib.dll/.so/.dylib
+
+  - kernel has loader program that delegates dynamic library resolution and linking
+    - which program to use can be encoded in the container
+      - (PE, ELF, Mach-O)
+    - kernel just needs to know which program to hand control over for linking
+
+  - .a files (archives) is a collection of .o files
+    - archive files across platforms don't differ too much
+      - but not enough for 1:1 compatability
+	
+  - can iterate over each object file in archive
+  - archives can have multiple entries with the same name
+  - can also encode any kind of data in archives, not just obj files
+
+
+  - if our .a contains multiple .o's we can just pass the .a to the linker and it will link
+
+  - if we provide our linker with -l<name>, it will look for lib<name>.<ext>
+    - in the paths we pass via -L/path/to/some/where
+      
+    - if we ask the linker to produce a shared executable
+      - via -shared flag
+	- it will look for .so or .dylib first and then fall back to .a
+      - -static
+	- it will look for .a only
+
+
+  - compiler will pass a few default libs to the linker
+    - unless you specifically ask not to via -nostdlibs
+    - compiler may be giving you libc, libm, and, libdl (dynamic loading)
+
+
+  - underneath libc are system calls
+    - system calls tell that kernel to invoke a kernel function
+    - sys calls are neither necessarily stable across kernel versions, nor across the same operating system
+      - thus every OS comes with its own libc
+
+  - there can be multiple libraries that implement system calls (multiple libc's)
+    - not common for windows or macOS
+    - but a few for linux
+      - glibc gnu libc
+      - musl
+      - diet
+      - and others including
+	- bionic the libc for android
+
+    - android is a linux kernel with a custom libc called bionic
+      - its a mash of bsd libc's with some gogole libc and other features.
+
+  - Can recompile the main.c on various platforms and have it work
+    - as they all provide libcs that provide printf
+      - and with the same semantics
+    - this is where standards for those libraries arise. i.e POSIX
+      - if your libc is POSIX standard compliant.
+	- software written against POSIX functions should work on any operating system that comes witha kernel and alibc that implements those functions
+
+
+  - if you programming lang doesnt want to rely on any of this libc logic
+    - it can provide low level implementation
+      - e.g instead of calling printf and other functionality provided by the libc
+	- can just call into the kernel directly with sys calls (still seems to require standards such as POSIX)
+	  - this is what GO did
+	  - requires that rely on stability of syscalss
+	- usually sys calls maintain back ward compat across kernel versions
+	  - but this is a different case for macos
+	    - no guarantee
+	  - best to use the libc of mac i.e libSystem
+
+  - kernel doesn't provide loader for DSOs, so need to provide our own
+    - if we build a fully static exec, only need a kernel that supports the syscals of the libc we linked into our exec calls.
+
+	
+- System triples:
+  <architecture>-<vendor>-<operating system>
+  - architectures:
+    - aarch64 (alias arm64)
+    - x86_64  (alias amd64)
+    - i386
+    - ....
+  - vendors:
+    - pc
+    - none
+    - unknwon
+    - apple
+    - ...
+  - operating-system:
+    - kernel describes os sufficiently enough
+    - macos
+    - ios
+    - android
+    - windows
+    - darwin
+    - freebsd
+    - linux
+
+      - darwin is umbrella across macos, ios, tvos
+	- anything that supposed to work on apples kernel with libSystem
+	  - darwin12 with system version specified
+      - similarly freebsd12
+      - also theres
+	- linux-gnu
+	- linux-musl
+	  - to indiciate libc
+	    
+- aarch64-darwin
+  - means apple operating system on a 64bit arm cpu
+    
+- aarch64-android
+- aarch64-linux-bionic
+  
+  - are synonymous
+
+- a lot of effort goes into making autotools parse triples
+  - vendor can be optional
+  
+- aarch64-ios and aarch64-macos are both aarch64-darwin
+  - if we build a lib on aarch64-macos
+    - with a native stage2 (opposed to cross compiler)
+    - its the same as aarch64-ios?
+
+- GHC Stages:
+  - When building GHC, use a boostrap (stage0) compiler to build stage1 compiler
+
+  - depending on difference between stage0 compiler and stage1
+    - might run into suble bugs
+      - stage1 does not follow the
+	- same codegegen or
+	- calling convetions
+
+	  - as stage0 compiler we used to build it with
+	  
+      - to overcome, need to build ghc from source again
+	- but this time use stage1 compiler
+	- this yields full stage2 compiler
+
+  - we're running the compilers on the same sources?
+
+      
+ - If a cross compiler would compile itself
+   - it would produce a compiler for the target
+     - but not for the host we want it to run it on
+       - thus cross compilers are limited to stage1 compilers
+
+
+ - ideally we build cross compilers as virtual stage3 compilers
+   - we build the cross compiler with a boostrap compiler built from the identical sources
+
+ - can we not use a stage2 compiler and then use that compiler on the cross compiler sources?
+
+ - goal is to compile the haskell library natively on macOS
+   - need a slightly modified compiler
+     - needs to have
+       - --disable-large-address-space
+       - set during configure
+
+   - this will prvent the runtime from trying to grab
+     - 1T of address space during initalisation
+       - thi8s will fail on iOS, as iOS is not as permissable as macoS
+	 
+   - flake.nix for this is added to the repository
+   - haskell.nix used to turn cabal project into something nix can use
+   - flake-utils to multiplex this across various targets
+     - a bit extra glue to have cross targets as well
+   - some postinstall packaging hooks, to have hydra provide .zip files containing the library
+
+ - https://ci.zw3rk.com/eval/374#tabs-still-succeed
+   - file *.o
+   - shasum *.o
+   - $ hexdump -C test-ios.o > test-ios.o.hd
+   - $ hexdump -C test-mac.o > test-mac.o.hd
+
+   - $ otool -l test-ios.o > test-ios.o.otool
+   - $ otool -l test-mac.o > test-mac.o.otool
+   - $ diff -u test-ios.o.otool test-mac.o.otool
+
+
+
+ - for iOS, can natively compile on macOS (aarch64/x86)
+   - since both macOS and iOS use Mach-O
+   - although within the Mach-O there are some headers specifying the platoform it was built on
+     - can artificially modify the header to make it run
+     
+ - is ghc compiling with --sdk macos?
+ - when would this cause problems
+   - for safety wouldn't be too much issue to compile with iphone sdk
+
+ - $ mac2ios Libraries/libHSmobile-core-0.1.0.0-HfUuggbqw4DC9ci8Blc8Tf-ghc8.10.7.a
+ - $ mac2ios Libraries/libffi.a
+ - $ mac2ios Libraries/libgmp.a
+
+   - need to diable bitcode
+
+ - haskell.nix must have something for the cabal wrapper and working with xcode
+   
+   
+     
