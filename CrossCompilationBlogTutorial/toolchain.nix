@@ -32,18 +32,27 @@ rec {
      , cabal-install
      , haskellPackages
      , darwin
+     , xcbuild
      , target ? "aarch64-apple-ios"
      }: stdenv.mkDerivation {
-       target = target;
        name = "cabal-${target}";
-
-       target-ghc = "";
-       target-ghc-pkg = "";
-       target-clang = "";
-       target-ld = "";
-       target-hsc2hs = "";
-       
-       cabal-wrapper = ''
+       cabalWrapper = let
+         xcrun = "${xcbuild}/bin/xcrun";
+         clang = "${xcbuild}/Toolchains/XcodeDefault.xctoolchain/bin/clang";
+         ld = "${xcbuild}/Toolchains/XcodeDefault.xctoolchain/bin/ld";
+         deps = { aarch64-apple-ios = { ghc = "${ghc-aarch64-apple-ios}/bin/aarch64-apple-ios-ghc $@";
+                                        ghc-pkg = "${ghc-aarch64-apple-ios}/bin/aarch64-apple-ios-ghc-pkg $@";
+                                        clang = "${xcrun} --sdk iphoneos ${clang} -arch arm64 $@";
+                                        ld = "${xcrun} --sdk iphoneos ${ld} -arch arm64 $@";
+                                        hsc2hs = "${ghc-aarch64-apple-ios}/bin/aarch64-apple-ios-hs2cs --cross-compile $@"; };
+                  x86_64-apple-ios = { ghc = ghc-x86_64-apple-ios;
+                                       ghc-pkg = "";
+                                       clang = "";
+                                       ld = "";
+                                       hsc2hs = ""; }; };
+         deps2 = deps.${target};
+         # need to make each of the deps a binary
+       in ''
        fcommon="--builddir=dist/${target}"
        fcompile=" --with-ghc=${target}-ghc"
        fcompile+=" --with-ghc-pkg=${target}-ghc-pkg"
@@ -53,14 +62,18 @@ rec {
        fcompile+=" --hsc2hs-options=--cross-compile"
 	     fconfig="--disable-shared --configure-option=--host=${target}"
        case $1 in
-	          configure|install) flags="${fcommon} ${fcompile} ${fconfig}" ;;
-	          build)             flags="${fcommon} ${fcompile}" ;;
-	          new-configure|new-install) flags="${fcompile} ${fconfig}" ;;
-	          new-build)         flags="${fcompile}" ;;
+	          configure|install) flags="''${fcommon} ''${fcompile} ''${fconfig}" ;;
+	          build)             flags="''${fcommon} ''${fcompile}" ;;
+	          new-configure|new-install) flags="''${fcompile} ''${fconfig}" ;;
+	          new-build)         flags="''${fcompile}" ;;
 	          list|info|update)  flags="" ;;
 	          "")                flags="" ;;
 	          *)                 flags=$fcommon ;;
        esac;;
+
+       ${deps2.ghc}
+       ${darwin.xcode}
+       ${xcbuild}
        '';
        
        builder = ./nixScripts/init_toolchain.sh;
