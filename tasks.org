@@ -49,25 +49,27 @@ Package resolver quite essential for wide range of users.
       - GHC version 8.4.0 does not support BlockArguments
     - I havan't gotten to the point of the error, but there it's highly likely that template haskell would stop me from compiling the project as well.
       
-
+** IN_PROGRESS Compile Mobile Projects Using Moritzs New Solutions (GHC 8.10.7)
+- [[file:ChristmasStoryLogs/README.org]]
+  
 ** UNREFINED_TASK Compling GHC Cross Compiler of arbitrary versions
 *** UNREFINED_TASK Compile a GHC Cross Compiler of arbitrary versions
 - Understand the process of compilation through the blogs [[file:notes.org::*zw3rk Blog][zw3rk Blog]]. 
 - Create/Gather scripts for compiling a cross compiler.
 *** UNREFINED_TASK Create a 'compiling a cross compiler for mobile' Wiki entry.
 - Things involved when compiling Haskell and what are the relevant steps for cross compile for a platform.
-
-** IN_PROGRESS Understand what the toolchain wrappers are doing
-
-** IN_PROGRESS Handle Template Haskell
-*** IN_PROGRESS Implement zw3rk template haskell solutions for iOS.
+** DONE Understand what the toolchain wrappers are doing
+CLOSED: [2021-12-29 Wed 13:34]
+- For darwin, essentially passing flags to cabal, and wrapping clang with xcrun clang --sdk iphoneos/macos ..
+  - [[file:notes.org::*toolchain-wrapper / ghc iOS scripts][toolchain-wrapper / ghc iOS scripts]]
+** SUSPENDED Handle Template Haskell (Suspended in order to implement up to date non TH cross compilation solution, whereas this task was aiming to build upon old GHC)
+*** SUSPENDED Implement zw3rk template haskell solutions for iOS.
 **** DONE Compile iserv-proxy
 CLOSED: [2021-12-27 Mon 09:37]
 **** IN_PROGRESS Compile cross compile GHCSlave
 **** IN_PROGRESS Setup Nix expressions for reproducability
-*** TODO Implement zw3rk template haskell solutions for Android.
+*** SUSPENDED Implement zw3rk template haskell solutions for Android.
 *** UNREFINED_TASK Create a 'dealing with Template Haskell' Wiki entry.
-
 
 ** UNREFINED_TASK Create a 'using Haskell libraries' Wiki entry.
 ** UNREFINED_TASK Create a 'common OS Haskell interop patches' Wiki entry, detailing how to patch a library to work for mobile.

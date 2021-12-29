@@ -62,15 +62,17 @@ rec {
          fcompile+=" --with-hsc2hs=${wrappedCommands.hsc2hs}"
          fcompile+=" --hsc2hs-options=--cross-compile"
          fconfig="--disable-shared --configure-option=--host=${target}"
-            case $1 in
-	          configure|install) flags="''${fcommon} ''${fcompile} ''${fconfig}" ;;
-	          build)             flags="''${fcommon} ''${fcompile}" ;;
-	          new-configure|new-install) flags="''${fcompile} ''${fconfig}" ;;
-	          new-build)         flags="''${fcompile}" ;;
-	          list|info|update)  flags="" ;;
-	          "")                flags="" ;;
-	          *)                 flags=$fcommon ;;
-            esac
+
+         case $1 in
+	       configure|install) flags="''${fcommon} ''${fcompile} ''${fconfig}" ;;
+	       build)             flags="''${fcommon} ''${fcompile}" ;;
+	       new-configure|new-install) flags="''${fcompile} ''${fconfig}" ;;
+	       new-build)         flags="''${fcompile}" ;;
+	       list|info|update)  flags="" ;;
+	       "")                flags="" ;;
+	       *)                 flags=$fcommon ;;
+         esac
+
          exec ${cabal-install}/bin/cabal $flags $@
          '';
        builder = writeScript "builder"
@@ -85,6 +87,6 @@ rec {
           darwin.xcode
           # wrappedCabal
        ];
-      }) { });
+     }) { });
 }
   
