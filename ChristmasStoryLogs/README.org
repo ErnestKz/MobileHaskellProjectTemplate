@@ -1,3 +1,131 @@
 * Christmas Story Logs
-Ipmplementation of solutions at at https://github.com/zw3rk/mobile-core-log
+- Implementation of solutions at at https://github.com/zw3rk/mobile-core-log
 
+- https://github.com/zw3rk/mobile-core
+- https://github.com/zw3rk/mobile-core-android
+- https://github.com/zw3rk/mobile-core-ios
+- https://github.com/zw3rk/mobile-core-tools
+
+
+- Builds: https://ci.zw3rk.com/
+  - https://ci.zw3rk.com/jobset/zw3rk/mobile-core
+
+** About haskell.nix
+- Looks like the cabal project is configured to build in CI.
+  - haskell.nix is used to achieve this.
+- The flake seems to create the static libraries for that mobile platform.
+  - creates the haskell libraries as object files.
+  - and also creates some other non-haskell origin object files
+
+
+*** Steps for xcode iOS Simulator
+- Compile the HS project to produce .o files i.e a single .a
+  - Compile for aarch64 and x86 (with iphoneos sdk)
+  - Create universal library from these archives
+    - probably need to include the non haskell archive aswell
+
+#+begin_src sh
+    aarch64dir=./lib:mobile-core:smallAddressSpace:static.aarch64-darwin
+    x86dir=./lib:mobile-core:static.x86_64-darwin
+
+    hslib=libHSmobile-core-0.1.0.0-HfUuggbqw4DC9ci8Blc8Tf-ghc8.10.7.a
+    ffilib=libffi.a
+    gmplib=libgmp.a
+    gmpxxlib=libgmpxx.a
+
+    mkdir -p lib
+
+    lipo -create -output lib/libhs.a $aarch64dir/$hslib $x86dir/$hslib
+    lipo -create -output lib/$ffilib $aarch64dir/$ffilib $x86dir/$ffilib
+    lipo -create -output lib/$gmplib $aarch64dir/$gmplib $x86dir/$gmplib
+    lipo -create -output lib/$gmpxxlib $aarch64dir/$gmpxxlib $x86dir/$gmpxxlib
+#+end_src      
+
+** Summary
+- Cross compilers available here:
+  - https://ci.zw3rk.com/eval/374#tabs-still-succeed
+  - These compilers have --disable-large-address-space set during configure of the compiler compilation.
+    - Will prevent runtime from trying to grab 1T of address space during initalisation which fails on iOS.
+
+  - Can grab lib:mobile-core:smallAddressSpace:static.aarch64-darwin
+    - zip link available
+
+#+begin_src sh
+# https://ci.zw3rk.com/build/427451
+NAME=lib:mobile-core:smallAddressSpace:static.aarch64-darwin
+curl -L -O https://ci.zw3rk.com/build/427451/download/1/pkg.zip
+unzip ./pkg.zip -d $NAME
+#+end_src    
+
+#+begin_src sh
+  file ./*.a 			# inspect files
+  # ./libHSmobile-core-0.1.0.0-HfUuggbqw4DC9ci8Blc8Tf-ghc8.10.7.a: current ar archive random library
+  # ./libffi.a:                                                    current ar archive random library
+  # ./libgmp.a:                                                    current ar archive random library
+  # ./libgmpxx.a:                                                  current ar archive
+#+end_src
+
+#+begin_src sh
+  mkdir tmp
+  cd tmp
+  ar x ../libHSmobile-core-0.1.0.0-HfUuggbqw4DC9ci8Blc8Tf-ghc8.10.7.a
+  file ./*.o
+
+  # ./Adjustor.o:           Mach-O 64-bit object arm64
+  # ./Alloc.o:              Mach-O 64-bit object arm64
+  # ./Applicative.o:        Mach-O 64-bit object arm64
+  # ./Apply.o:              Mach-O 64-bit object arm64
+  # ./Arena.o:              Mach-O 64-bit object arm64
+  # ./Arr.o:                Mach-O 64-bit object arm64
+  # ...
+#+end_src
+
+** Creating iOS app
+- Download darwin builds for both archs:
+  #+begin_src sh
+    # https://ci.zw3rk.com/build/427451
+    NAME=lib:mobile-core:smallAddressSpace:static.aarch64-darwin
+    curl -L -O https://ci.zw3rk.com/build/427451/download/1/pkg.zip
+    unzip ./pkg.zip -d $NAME
+
+    # https://ci.zw3rk.com/build/427453
+    NAME=lib:mobile-core:static.x86_64-darwin
+    curl -L -O https://ci.zw3rk.com/build/427453/download/1/pkg.zip
+    unzip ./pkg.zip -d $NAME
+  #+end_src
+
+https://github.com/zw3rk/mobile-core-tools/blob/master/mac2ios.c
+- Patch the mach-o files to contain ios header instead of macos header
+  - since these libs were built natively on aarch64 macos
+    - since libSystem.dylib is presumably the same on macos and iphone, just need to trick the kernel to run them
+#+begin_src sh
+
+  # does not work for x86 (for simulator)
+  # but I guess can compile normally via xcrun?
+
+  mac2ios Libraries/libHSmobile-core-0.1.0.0-HfUuggbqw4DC9ci8Blc8Tf-ghc8.10.7.a
+  mac2ios Libraries/libffi.a
+  mac2ios Libraries/libgmp.a
+#+end_src
+
+- Need to create universal libraries
+#+begin_src sh
+aarch64dir=lib:mobile-core:smallAddressSpace:static.aarch64-darwin
+x86dir=lib:mobile-core:static.x86_64-darwin
+
+hslib=libHSmobile-core-0.1.0.0-HfUuggbqw4DC9ci8Blc8Tf-ghc8.10.7.a
+ffilib=libffi.a
+gmplib=libgmp.a
+gmpxxlib=libgmpxx.a
+
+mkdir -p lib
+
+lipo -create -output lib/libhs.a $aarch64dir/$hslib $x86dir/$hslib
+lipo -create -output lib/$ffilib $aarch64dir/$ffilib $x86dir/$ffilib
+lipo -create -output lib/$gmplib $aarch64dir/$gmplib $x86dir/$gmplib
+lipo -create -output lib/$gmpxxlib $aarch64dir/$gmpxxlib $x86dir/$gmpxxlib
+#+end_src
+
+- Link the resulting libs in xcode.
+
+  

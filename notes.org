@@ -588,8 +588,6 @@ https://stackoverflow.com/questions/25765893/how-do-i-install-dependencies-when-
 - Does architecture difference really affect haskell code execution?
   - Seems like only if using IO
   - If not, then just generate TH splices using build machine
-
-- what is darwin_compile.sh doing?    
 *** Reading
 https://github.com/zw3rk/mobile-core-log/blob/master/LOG.md
 

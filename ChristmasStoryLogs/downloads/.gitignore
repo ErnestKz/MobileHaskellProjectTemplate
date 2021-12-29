@@ -1,0 +1,4 @@
+lib
+lib:mobile-core:smallAddressSpace:static.aarch64-darwin
+lib:mobile-core:static.x86_64-darwin
+mobile-core-tools
