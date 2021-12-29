@@ -17,13 +17,10 @@
   - creates the haskell libraries as object files.
   - and also creates some other non-haskell origin object files
 
-
-*** Steps for xcode iOS Simulator
+*** Steps for xcode iOS Simulator (when compile for iphoneos sdk)
 - Compile the HS project to produce .o files i.e a single .a
   - Compile for aarch64 and x86 (with iphoneos sdk)
   - Create universal library from these archives
-    - probably need to include the non haskell archive aswell
-
 #+begin_src sh
     aarch64dir=./lib:mobile-core:smallAddressSpace:static.aarch64-darwin
     x86dir=./lib:mobile-core:static.x86_64-darwin
@@ -40,6 +37,7 @@
     lipo -create -output lib/$gmplib $aarch64dir/$gmplib $x86dir/$gmplib
     lipo -create -output lib/$gmpxxlib $aarch64dir/$gmpxxlib $x86dir/$gmpxxlib
 #+end_src      
+
 
 ** Summary
 - Cross compilers available here:
@@ -98,6 +96,8 @@ https://github.com/zw3rk/mobile-core-tools/blob/master/mac2ios.c
 - Patch the mach-o files to contain ios header instead of macos header
   - since these libs were built natively on aarch64 macos
     - since libSystem.dylib is presumably the same on macos and iphone, just need to trick the kernel to run them
+
+- the patching tool does not work for x86, will need to use xcrun clang --sdk iphoneos
 #+begin_src sh
 
   # does not work for x86 (for simulator)
