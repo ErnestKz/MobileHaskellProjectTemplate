@@ -49,9 +49,12 @@ Package resolver quite essential for wide range of users.
       - GHC version 8.4.0 does not support BlockArguments
     - I havan't gotten to the point of the error, but there it's highly likely that template haskell would stop me from compiling the project as well.
       
-** IN_PROGRESS Compile Mobile Projects Using Moritzs New Solutions (GHC 8.10.7)
+** SUSPENDED Compile Mobile Projects Using Moritzs New Solutions (GHC 8.10.7)
 - [[file:ChristmasStoryLogs/README.org]]
-  
+- Perhaps not the best use of time reimplementing already implemented solution.
+  - Maybe better to disect and understand the compilation steps of nix expressions that seem to have the solution for CI of android and iOS.
+** IN_PROGRESS Inspect what the existing Nix expressions are doing: Reflex-FRP, Haskell.nix
+
 ** UNREFINED_TASK Compling GHC Cross Compiler of arbitrary versions
 *** UNREFINED_TASK Compile a GHC Cross Compiler of arbitrary versions
 - Understand the process of compilation through the blogs [[file:notes.org::*zw3rk Blog][zw3rk Blog]]. 
