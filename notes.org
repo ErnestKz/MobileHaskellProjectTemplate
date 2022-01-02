@@ -894,5 +894,44 @@ https://godbolt.org/
 
 
 ** Nix: Reflex-FRP, haskell.nix 
+*** Tools For Inspecting Nix Expressions
+https://github.com/utdemir/nix-tree
+
+nix-store -q --referrers
+nix-store -q --references
+
+nix-store --query
 
 
+# build time deps
+nix-store --query --tree /nix/store/.....drv
+
+# reverse dependencies
+nix-store --query --referrers-closure /nix/store/.....drv
+
+# also when executing on a build product, gives runtime deps
+# runtime time deps
+nix-store --query --tree /nix/store/.....
+
+# runtime reverse dependencies
+nix-store --query --referrers-closure /nix/store/.....
+
+# gives the corresponding derivation
+nix-store --query /nix/store/.....
+
+
+nix show-derivation /nix/store/z3hhlxbckx4g3n9sw91nnvlkjvyw754p-myname.drv
+
+# realise a derivation
+nix-store -r /nix/store/z3hhlxbckx4g3n9sw91nnvlkjvyw754p-myname.drv
+
+
+
+
+
+# rich diff of two derivations
+nix-diff
+
+
+# show the tree of a directory
+tree
