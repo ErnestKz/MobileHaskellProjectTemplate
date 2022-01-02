@@ -926,12 +926,57 @@ nix show-derivation /nix/store/z3hhlxbckx4g3n9sw91nnvlkjvyw754p-myname.drv
 nix-store -r /nix/store/z3hhlxbckx4g3n9sw91nnvlkjvyw754p-myname.drv
 
 
-
-
-
 # rich diff of two derivations
 nix-diff
 
 
 # show the tree of a directory
 tree
+*** Reflex-FRP
+https://github.com/obsidiansystems/obelisk
+**** Commands
+nix-instantiate -A android.frontend
+
+/nix/store/wb9xmaza1fym7rxz1srpc23c9gifkbib-android-app.drv
+
+nix show-derivation /nix/store/wb9xmaza1fym7rxz1srpc23c9gifkbib-android-app.drv
+
+nix-query-tree-viewer
+nix-tree
+
+When run on derivation, can see the other input derivations.
+When run on store path, can see the runtime deps, although as of now not sure of the significance of this.K
+
+**** What am I looking for?
+- How does obelisk work?
+
+  - How does it compile the cabal project?
+    - What input derivations are used to create the compiler?
+    - What input derivations are used to create the build cabal?
+    - What flags and settings does cabal take to create the output?
+    - What are the outputs of the compiled code?
+   
+  - How does it build an android app?
+    - How does it use the Haskell outputs to link with the android app?
+    - What android boiler plate is there to create the app?
+    - What are the commands and tools used to compile the app?
+    - How does it package the android app that's ready to be pushed onto the device?
+      
+**** How am I going to find this out?
+- Have the derivations available.
+  - This will tell me the raw inputs that make up a certain output/derivation.
+    - Build Script
+    - Source Code
+    - Command Line Tools and Libraries
+
+  - In particular, the build script will reveal the commands that are run for each step and will reveal critical information.
+    - The environemnt variables used in the build script can be used with the 'nix show-derivation' command.
+
+  - However this doesn't really tell me how the nix expressions are conceptually structured.
+    - Since nix expression syntactic structure don't necessarily have to structurally correspond to derivations that it generates.
+
+      
+- Will perhaps have to dig through the nix expressions of the sample project.
+  
+
+    
