@@ -977,6 +977,198 @@ When run on store path, can see the runtime deps, although as of now not sure of
 
       
 - Will perhaps have to dig through the nix expressions of the sample project.
-  
+  - Perhaps the nix expression digging can be lead by derivation digging.  
 
-    
+**** Derivation Inspection
+#+begin_src sh
+  nix-query-tree-viewer /nix/store/wb9xmaza1fym7rxz1srpc23c9gifkbib-android-app.drv
+  nix show-derivation /nix/store/wb9xmaza1fym7rxz1srpc23c9gifkbib-android-app.drv
+#+end_src
+
+"builder": "/nix/store/506nnycf7nk22x7n07mjjjl2g8nifpda-bash-4.4-p23/bin/bash",
+"args": [
+      "-e",
+      "/nix/store/9krlzvny65gdc8s7kpb6lkx8cd02c25b-default-builder.sh"
+      ],
+
+"env": {
+"buildCommand": "mkdir -p \"$out/bin\"\ncp -r \"$src\"/* \"$out\"\nsubstitute /nix/store/x3h06wmikhw3z05mqx84aghb9ydg5bk4-deploy.sh $out/bin/deploy \\\n  --subst-var-by coreutils /nix/store/3kqc2wmvf1jkqb2jmcm7rvd9lf4345ra-coreutils-8.31 \\\n  --subst-var-by adb /nix/store/6n00n2l97323dmrx63bm6ssf4ls0f5lx-platform-tools-29.0.6 \\\n  --subst-var-by java /nix/store/6yicryn6ycbl8ipc5np67gkn2y5a60is-openjdk-12.0.2-ga \\\n  --subst-var-by out $out\nchmod +x \"$out/bin/deploy\"\n",
+"buildInputs": "/nix/store/jix2yw3rx0xp56lzfgl33llgakv01pb7-androidsdk",
+"builder": "/nix/store/506nnycf7nk22x7n07mjjjl2g8nifpda-bash-4.4-p23/bin/bash",
+...
+}
+
+#+begin_src sh
+cat /nix/store/506nnycf7nk22x7n07mjjjl2g8nifpda-bash-4.4-p23/bin/bash
+#+end_src
+source $stdenv/setup
+genericBuild
+
+"stdenv": "/nix/store/lac6smkv5bgjf5ijiggdpiwx3jsrcypn-stdenv-linux"
+
+$stdenv/setup contains the definition for genericBuild
+
+genericBuild simply executes the buildCommand since it is defined in the env variables
+#+begin_src sh
+genericBuild() {
+    if [ -f "${buildCommandPath:-}" ]; then
+        local oldOpts="-u"
+        shopt -qo nounset || oldOpts="+u"
+        set +u
+        source "$buildCommandPath"
+        set "$oldOpts"
+        return
+    fi
+    if [ -n "${buildCommand:-}" ]; then
+        local oldOpts="-u"
+        shopt -qo nounset || oldOpts="+u"
+        set +u
+        eval "$buildCommand"
+        set "$oldOpts"
+        return
+    fi
+#+end_src
+
+#+begin_src sh
+  mkdir -p \"$out/bin\"\ncp -r \"$src\"/* \"$out\"\nsubstitute /nix/store/x3h06wmikhw3z05mqx84aghb9ydg5bk4-deploy.sh $out/bin/deploy \\\n  --subst-var-by coreutils /nix/store/3kqc2wmvf1jkqb2jmcm7rvd9lf4345ra-coreutils-8.31 \\\n  --subst-var-by adb /nix/store/6n00n2l97323dmrx63bm6ssf4ls0f5lx-platform-tools-29.0.6 \\\n  --subst-var-by java /nix/store/6yicryn6ycbl8ipc5np67gkn2y5a60is-openjdk-12.0.2-ga \\\n  --subst-var-by out $out\nchmod +x \"$out/bin/deploy\"\n
+#+end_src
+
+#+begin_src sh
+  mkdir -p $out/bin
+  cp -r $src/* $out
+  substitute /nix/store/x3h06wmikhw3z05mqx84aghb9ydg5bk4-deploy.sh $out/bin/deploy
+  --subst-var-by coreutils /nix/store/3kqc2wmvf1jkqb2jmcm7rvd9lf4345ra-coreutils-8.31
+  --subst-var-by adb /nix/store/6n00n2l97323dmrx63bm6ssf4ls0f5lx-platform-tools-29.0.6
+  --subst-var-by java /nix/store/6yicryn6ycbl8ipc5np67gkn2y5a60is-openjdk-12.0.2-ga
+  --subst-var-by out $out
+  chmod +x $out/bin/deploy
+#+end_src
+
+Mainly just copies the stuff in src into the output.
+"src": "/nix/store/q3f6za3ajl240lqp87dvc5nbajqav2sg-systems.obsidian.obelisk.examples.minimal",
+This is the android.apk app
+
+nix-store --query --deriver /nix/store/q3f6za3ajl240lqp87dvc5nbajqav2sg-systems.obsidian.obelisk.examples.minimal
+
+This gives us the derivation:
+/nix/store/dnq3ydsndizynm8l5nqfvz0nx38zckyd-systems.obsidian.obelisk.examples.minimal.drv
+
+#+begin_src sh
+nix-query-tree-viewer /nix/store/dnq3ydsndizynm8l5nqfvz0nx38zckyd-systems.obsidian.obelisk.examples.minimal.drv
+nix show-derivation /nix/store/dnq3ydsndizynm8l5nqfvz0nx38zckyd-systems.obsidian.obelisk.examples.minimal.drv
+#+end_src
+
+The builder is also just a genericBuild
+
+The derivation has a buildPhase env variable defined.
+#+begin_src sh
+\nbuildDir=`pwd`\ncp -rL $ANDROID_HOME $buildDir/local_sdk\nchmod -R 755 local_sdk\nexport ANDROID_HOME=$buildDir/local_sdk/android-sdk\n# Key files cannot be stored in the user's home directory. This\n# overrides it.\nexport ANDROID_SDK_HOME=`pwd`\n\nmkdir -p \"$ANDROID_HOME/licenses\"\necho -e \"\\n8933bad161af4178b1185d1a37fbf41ea5269c55\" > \"$ANDROID_HOME/licenses/android-sdk-license\"\necho -e \"\\n84831b9409646a918e30573bab4c9c91346d8abd\" > \"$ANDROID_HOME/licenses/android-sdk-preview-license\"\n\nexport APP_HOME=`pwd`\n\nmkdir -p .m2/repository\nif [ -d \"$DEPENDENCIES/m2\" ] ; then\n  cp -RL \"$DEPENDENCIES\"/m2/* .m2/repository/\nfi\nchmod -R 755 .m2\nmkdir -p .m2/repository/com/android/support\ncp -RL local_sdk/android-sdk/extras/android/m2repository/com/android/support/* .m2/repository/com/android/support/\ngradle assembleDebug --offline --no-daemon -g ./tmp -Dmaven.repo.local=$(pwd)/.m2/repository\n
+#+end_src
+
+#+begin_src sh
+  buildDir=`pwd`
+  cp -rL $ANDROID_HOME $buildDir/local_sdk
+  chmod -R 755 local_sdk
+  export ANDROID_HOME=$buildDir/local_sdk/android-sdk
+  # Key files cannot be stored in the user's home directory. This
+  # overrides it.
+  export ANDROID_SDK_HOME=`pwd`
+
+  mkdir -p $ANDROID_HOME/licenses
+  echo -e
+  8933bad161af4178b1185d1a37fbf41ea5269c55 > $ANDROID_HOME/licenses/android-sdk-license
+  echo -e
+  84831b9409646a918e30573bab4c9c91346d8abd > $ANDROID_HOME/licenses/android-sdk-preview-license
+
+  export APP_HOME=`pwd`
+
+  mkdir -p .m2/repository
+
+  if [ -d $DEPENDENCIES/m2 ] ; then
+      cp -RL $DEPENDENCIES/m2/* .m2/repository/
+  fi
+  chmod -R 755 .m2
+  mkdir -p .m2/repository/com/android/support
+  cp -RL local_sdk/android-sdk/extras/android/m2repository/com/android/support/* .m2/repository/com/android/support/
+
+  gradle assembleDebug --offline --no-daemon -g ./tmp -Dmaven.repo.local=$(pwd)/.m2/repository
+#+end_src
+The script sets up the paths for gradle to build.
+
+Namely it sets up maven dependenices from the nix store and then uses them to build the gradle project
+Maven deps:
+/nix/store/j9iaycd4hnsylhgi7kkpy77m1b46k7hz-systems.obsidian.obelisk.examples.minimal-maven-deps
+
+Probably at this point good idea to find where these build scripts correspond to in the nix expressions.
+what does build inputs do? Probably something for stdenv
+https://nixos.org/manual/nixpkgs/stable/#ssec-stdenv-dependencies
+
+
+buildPhase is just one of the phases that gets executed in the genericBuild
+
+installPhase is also defined
+#+begin_src sh
+  mkdir -p $out
+  cp -RL build/outputs/apk/*/*.apk $out
+#+end_src
+first comes unpackPhase
+- it uses the $src/srcs env variable
+
+src is  /nix/store/cvwszjih0wrm8fayfvhdb272dk7s9j3d-android-app
+/nix/store/62w6j6dsbn5mjr21kvpwx6px7dzzwkwf-android-app.drv
+This contains the java source code.
+It also contians the compiled haskell libraries
+
+
+Maven Dependencies are these:
+/nix/store/j9iaycd4hnsylhgi7kkpy77m1b46k7hz-systems.obsidian.obelisk.examples.minimal-maven-deps
+
+#+begin_src 
+nix show-derivation /nix/store/62w6j6dsbn5mjr21kvpwx6px7dzzwkwf-android-app.drv
+#+end_src
+this one has a bunch of input derivations, some input derivations look like the compiled results of the haskell code.
+buildCommand also something to look into
+
+buildCommand:
+#+begin_src sh
+  cp -r --no-preserve=mode $src $out
+  mkdir -p $out/src/main
+  cp -r --no-preserve=mode $javaSrc $out/src/main/java
+  ln -s $buildGradle $out/build.gradle
+  ln -s $androidManifestXml $out/AndroidManifest.xml
+  mkdir -p $out/res/values
+  ln -s $stringsXml $out/res/values/strings.xml
+  mkdir -p $out/jni
+  ln -s $applicationMk $out/jni/Application.mk
+
+  {
+      ARCH_LIB=$out/lib/arm64-v8a
+      mkdir -p $ARCH_LIB
+      local exe=/nix/store/s4qvcl4z6z8g3nmvwnydj5gwgviaqkn7-frontend-0.1-aarch64-unknown-linux-android/bin/libfrontend.so
+      if [ ! -f $exe ] ; then
+	  >&2 echo 'Error: executable \"frontend\" not found'
+	  exit 1
+      fi
+      cp --no-preserve=mode $exe $ARCH_LIB/libHaskellActivity.so
+
+  }
+  ....
+#+end_src
+Probably can look this up in the nix expressions
+
+
+/nix/store/m52s5zrg4vdb4v7ll54p27ipnyrh6d71-frontend-0.1-armv7a-unknown-linux-androideabi.drv
+
+/nix/store/rjw2armia65m1w5bhc8vjlqamxvnn5ia-frontend-0.1-aarch64-unknown-linux-android.drv
+
+#+begin_src sh
+nix show-derivation /nix/store/rjw2armia65m1w5bhc8vjlqamxvnn5ia-frontend-0.1-aarch64-unknown-linux-android.drv
+#+end_src
+
+This is the derivation that compiles the haskell libraries.
+
+
+Encountered this:
+https://github.com/wavewave/nix-build-ghc-android
+
+Could clone reflex-frp obsidian to do greps over.
