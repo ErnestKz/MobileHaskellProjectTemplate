@@ -1191,3 +1191,23 @@ Maybe the derivation that links the build outputs is the previous one looked at:
 
 reflex-platform/android/impl.nix contains code partly responsible for the android-app.drv
 reflex-platform/android/default.nix
+
+
+**** New Questions and Goals
+- How does it handle Template Haskell?
+  - It probably uses the solution of:
+    - nixpkgs/pkgs/development/haskell-modules/generic-builder.nix
+    - /nix/store/rjw2armia65m1w5bhc8vjlqamxvnn5ia-frontend-0.1-aarch64-unknown-linux-android.drv
+      - The derivation might have TH hints.
+  
+- How can I have a separate haskell app.
+  - And then java/kotlin code for andoird
+    - Where do I pass java code for android?
+    
+  - Swift code for iOS.
+
+
+reflex-platoform mentions Template Haskell, although no iserv
+
+Mentions of loading and saving splices:
+reflex-platform/haskell-overlays/splices-load-save
