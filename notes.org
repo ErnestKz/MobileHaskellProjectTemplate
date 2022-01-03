@@ -1129,6 +1129,8 @@ nix show-derivation /nix/store/62w6j6dsbn5mjr21kvpwx6px7dzzwkwf-android-app.drv
 this one has a bunch of input derivations, some input derivations look like the compiled results of the haskell code.
 buildCommand also something to look into
 
+
+
 buildCommand:
 #+begin_src sh
   cp -r --no-preserve=mode $src $out
@@ -1167,8 +1169,25 @@ nix show-derivation /nix/store/rjw2armia65m1w5bhc8vjlqamxvnn5ia-frontend-0.1-aar
 
 This is the derivation that compiles the haskell libraries.
 
-
 Encountered this:
 https://github.com/wavewave/nix-build-ghc-android
 
 Could clone reflex-frp obsidian to do greps over.
+
+
+nixpkgs/pkgs/development/haskell-modules/generic-builder.nix
+looks like it has work done for cross compilation
+
+
+How does it link up the android project files with the haskell outputs?
+
+
+The derivation responsible for compiling the haskell is this one:
+/nix/store/rjw2armia65m1w5bhc8vjlqamxvnn5ia-frontend-0.1-aarch64-unknown-linux-android.drv
+
+Maybe the derivation that links the build outputs is the previous one looked at:
+/nix/store/62w6j6dsbn5mjr21kvpwx6px7dzzwkwf-android-app.drv
+
+
+reflex-platform/android/impl.nix contains code partly responsible for the android-app.drv
+reflex-platform/android/default.nix
